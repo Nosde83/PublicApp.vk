@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PregApp</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="login-view" class="view">
+        <div class="login-card">
+            <span class="login-icon">🔒</span>
+            <h2>Bem-vindo ao PregApp</h2>
+            <p>Seu aplicativo de campo otimizado.</p>
+            <button id="login-btn" class="btn-primary">Entrar</button>
+            <div class="premium-feature" style="margin-top: 20px;">
+                <span class="premium-icon">👑</span>
+                <p>Login premium para sincronização na nuvem.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-content-wrapper" style="display:none;">
+        <header>
+            <span class="app-title-container">
+                <span class="app-icon">📖</span>
+                <div class="app-name">PregApp</div>
+            </span>
+            <div class="header-actions">
+                <button id="theme-btn" class="icon-only-btn">🎨</button>
+                <div class="date" id="current-date"></div>
+            </div>
+        </header>
+
+        <div class="main-content" id="main-content">
+            <div id="campo-view" class="view">
+                <h2 class="section-title">Calendário</h2>
+                <div class="calendar-nav">
+                    <button id="prev-month">⬅️</button>
+                    <span class="calendar-header" id="current-month-year"></span>
+                    <button id="next-month">➡️</button>
+                </div>
+                <div class="calendar" id="calendar"></div>
+            </div>
+
+            <div id="revisitas-view" class="view">
+                <div class="header-action-bar">
+                    <h2 class="section-title" style="margin: 0;">Revisitas</h2>
+                    <button class="btn-primary icon-only-btn add-btn" id="add-revisita-btn">➕</button>
+                </div>
+                <div id="revisitas-list"></div>
+            </div>
+
+            <div id="estudantes-view" class="view">
+                <div class="header-action-bar">
+                    <h2 class="section-title" style="margin: 0;">Meus Estudantes</h2>
+                    <button class="btn-primary icon-only-btn add-btn" id="add-student-btn">➕</button>
+                </div>
+                <div class="form-group search-bar">
+                    <input type="text" id="student-search" placeholder="Buscar por nome do estudante...">
+                </div>
+                <div class="student-list" id="student-list"></div>
+            </div>
+
+            <div id="relatorio-view" class="view">
+                <h2 class="section-title">Relatório Mensal</h2>
+                <div class="report-card">
+                    <h3>Estudos Bíblicos</h3>
+                    <div class="value" id="monthly-studies-count">0</div>
+                </div>
+                <div class="report-card">
+                    <h3>Horas de Campo</h3>
+                    <div class="value" id="monthly-hours-count">0</div>
+                </div>
+                <div class="premium-feature" style="margin-top: 20px;">
+                    <span class="premium-icon">👑</span>
+                    <h3>Relatórios Detalhados (Premium)</h3>
+                    <p>Gráficos de progresso e estatísticas. Assine para desbloquear!</p>
+                    <div class="chart-container" id="detailed-report-chart">
+                        <canvas id="monthly-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="definicoes-view" class="view">
+                <h2 class="section-title">Definições</h2>
+                <div class="form-group">
+                    <label for="publisher-name-input">Nome do Publicador</label>
+                    <input type="text" id="publisher-name-input">
+                </div>
+                <div class="form-group">
+                    <label for="profile-select">Perfil de Serviço</label>
+                    <select id="profile-select">
+                        <option value="publicador">Publicador</option>
+                        <option value="pioneiro_auxiliar">Pioneiro Auxiliar</option>
+                        <option value="pioneiro_integral">Pioneiro Regular</option>
+                    </select>
+                </div>
+                <div class="premium-feature" style="margin-top: 20px;">
+                    <span class="premium-icon">☁️</span>
+                    <h3>Sincronização na Nuvem (Premium)</h3>
+                    <p id="sync-status">Não sincronizado.</p>
+                    <button class="btn-primary icon-only-btn add-btn" id="sync-btn">🔄</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <a href="#campo" class="nav-item active">🗓️</a>
+            <a href="#revisitas" class="nav-item">👥</a>
+            <a href="#estudantes" class="nav-item">🎓</a>
+            <a href="#relatorio" class="nav-item">📊</a>
+            <a href="#definicoes" class="nav-item">⚙️</a>
+        </div>
+    </div>
+
+    <div id="add-hours-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-hours-title"></h2>
+                <span class="close-btn">❌</span>
+            </div>
+            <div id="hours-form">
+                <div id="hours-input-container"></div>
+                <button id="save-hours-btn" class="btn-primary">✅</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-revisita-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Revisita</h2>
+                <span class="close-btn">❌</span>
+            </div>
+            <form id="revisita-form">
+                <div class="form-group">
+                    <label for="revisita-nome">Nome</label>
+                    <input type="text" id="revisita-nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="revisita-endereco">Endereço</label>
+                    <input type="text" id="revisita-endereco">
+                </div>
+                <div class="form-group">
+                    <label for="revisita-telefone">Telefone</label>
+                    <input type="tel" id="revisita-telefone">
+                </div>
+                <div class="form-group">
+                    <label for="revisita-assunto">Assunto</label>
+                    <input type="text" id="revisita-assunto">
+                </div>
+                <div class="form-group">
+                    <label for="revisita-data">Data</label>
+                    <input type="date" id="revisita-data">
+                </div>
+                <div class="form-group">
+                    <label for="revisita-hora">Hora</label>
+                    <input type="time" id="revisita-hora">
+                </div>
+                <button type="submit" class="btn-primary">✅</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="add-student-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cadastrar Estudante</h2>
+                <span class="close-btn">❌</span>
+            </div>
+            <form id="student-form">
+                <div class="form-group">
+                    <label for="student-nome">Nome</label>
+                    <input type="text" id="student-nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="student-livro">Livro</label>
+                    <input type="text" id="student-livro">
+                </div>
+                <button type="submit" class="btn-primary">✅</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="edit-student-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="edit-student-title">Editar Estudante</h2>
+                <span class="close-btn">❌</span>
+            </div>
+            <form id="edit-student-form">
+                <div class="form-group">
+                    <label for="edit-student-livro">Livro</label>
+                    <input type="text" id="edit-student-livro">
+                </div>
+                <div class="form-group">
+                    <label for="edit-student-capitulo">Capítulo</label>
+                    <input type="number" id="edit-student-capitulo" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="edit-student-paragrafo">Parágrafo</label>
+                    <input type="number" id="edit-student-paragrafo" min="1">
+                </div>
+                <button type="submit" class="btn-primary">✅</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="theme-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Escolha um Tema</h2>
+                <span class="close-btn">❌</span>
+            </div>
+            <div class="theme-grid">
+                <button class="theme-option theme-default" data-theme="theme-default">Padrão</button>
+                <button class="theme-option theme-ocean" data-theme="theme-ocean">Oceano</button>
+                <button class="theme-option theme-sunset" data-theme="theme-sunset">Pôr do Sol</button>
+                <button class="theme-option theme-forest" data-theme="theme-forest">Floresta</button>
+                <button class="theme-option theme-violet" data-theme="theme-violet">Violeta</button>
+                <button class="theme-option theme-mango" data-theme="theme-mango">Manga</button>
+                <button class="theme-option theme-mint" data-theme="theme-mint">Menta</button>
+                <button class="theme-option theme-charcoal" data-theme="theme-charcoal">Carvão</button>
+                <button class="theme-option theme-lavender" data-theme="theme-lavender">Lavanda</button>
+                <button class="theme-option theme-espresso" data-theme="theme-espresso">Expresso</button>
+                <button class="theme-option theme-blueberry" data-theme="theme-blueberry">Mirtilo</button>
+                <button class="theme-option theme-rose" data-theme="theme-rose">Rosa</button>
+                <button class="theme-option theme-lime" data-theme="theme-lime">Limão</button>
+                <button class="theme-option theme-midnight" data-theme="theme-midnight">Meia-noite</button>
+                <button class="theme-option theme-sand" data-theme="theme-sand">Areia</button>
+                <button class="theme-option theme-coral" data-theme="theme-coral">Coral</button>
+                <button class="theme-option theme-steel" data-theme="theme-steel">Aço</button>
+                <button class="theme-option theme-gold" data-theme="theme-gold">Ouro</button>
+                <button class="theme-option theme-rust" data-theme="theme-rust">Ferrugem</button>
+                <button class="theme-option theme-sky" data-theme="theme-sky">Céu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
